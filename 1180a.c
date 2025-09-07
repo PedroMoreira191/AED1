@@ -2,7 +2,7 @@
 
 int main (){
     int N=0, x[10000];
-    int maior, menor;
+    int posicao, menor;
     
     while(N<1 || N>10000){
         scanf("%d", &N);
@@ -13,13 +13,13 @@ int main (){
     }
     
     menor = x[0];
-    maior =x[0];
     
     for(int i=0; i<N; i++){
-       
-        if(x[i]>maior) maior = x[i]; 
         
-        if(x[i]<menor) menor = x[i]; 
+        if(x[i]<menor){
+          menor = x[i];
+          posicao = i;
+        }  
     }
-    printf("%d\n%d\n", maior, menor);
+    printf("Menor valor: %d\nPosicao: %d\n", menor, posicao);
 }
