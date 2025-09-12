@@ -2,7 +2,7 @@
 
 int main (){
     int N=0, x[10000];
-    int posicao, menor, *p;
+    int posicao = 0, menor, *p;
     
     p = x;
     
