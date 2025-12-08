@@ -1,0 +1,75 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct {
+    int u, v, w;
+} Aresta;
+
+int *pai, *rankUF;
+
+int find(int x){
+    if(pai[x] != x)
+        pai[x] = find(pai[x]);
+    return pai[x];
+}
+
+void uniao(int a, int b){
+    a = find(a);
+    b = find(b);
+    if(a == b) return;
+    if(rankUF[a] < rankUF[b]) pai[a] = b;
+    else if(rankUF[b] < rankUF[a]) pai[b] = a;
+    else{
+        pai[b] = a;
+        rankUF[a]++;
+    }
+}
+
+int cmp(const void *a, const void *b){
+    Aresta *x = (Aresta*)a;
+    Aresta *y = (Aresta*)b;
+    return x->w - y->w;
+}
+
+int main(){
+    int M, N;
+
+    while(scanf("%d %d", &M, &N) && (M || N)){
+        Aresta *edges = (Aresta*) malloc(N * sizeof(Aresta));
+
+        for(int i = 0; i < N; i++){
+            scanf("%d %d %d", &edges[i].u, &edges[i].v, &edges[i].w);
+        }
+
+        pai = (int*) malloc(M * sizeof(int));
+        rankUF = (int*) calloc(M, sizeof(int));
+
+        for(int i = 0; i < M; i++){
+            pai[i] = i;
+            rankUF[i] = 0;
+        }
+
+        qsort(edges, N, sizeof(Aresta), cmp);
+
+        long long soma = 0;
+        int usados = 0;
+
+        for(int i = 0; i < N && usados < M-1; i++){
+            int u = edges[i].u;
+            int v = edges[i].v;
+            if(find(u) != find(v)){
+                uniao(u, v);
+                soma += edges[i].w;
+                usados++;
+            }
+        }
+
+        printf("%lld\n", soma);
+
+        free(edges);
+        free(pai);
+        free(rankUF);
+    }
+
+    return 0;
+}
