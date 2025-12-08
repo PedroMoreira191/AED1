@@ -1,0 +1,52 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int **g, *vis, *pilha, ciclo, N;
+
+void dfs(int v){
+    vis[v] = 1;
+    pilha[v] = 1;
+
+    for(int i=1;i<=N;i++){
+        if(g[v][i]){
+            if(!vis[i]) dfs(i);
+            else if(pilha[i]) ciclo = 1;
+        }
+    }
+    pilha[v] = 0;
+}
+
+int main(){
+    int T,M,A,B;
+    scanf("%d",&T);
+
+    while(T--){
+        scanf("%d %d",&N,&M);
+
+        g = malloc((N+1)*sizeof(int*));
+        for(int i=0;i<=N;i++){
+            g[i] = calloc(N+1,sizeof(int));
+        }
+
+        vis = calloc(N+1,sizeof(int));
+        pilha = calloc(N+1,sizeof(int));
+
+        while(M--){
+            scanf("%d %d",&A,&B);
+            g[A][B] = 1;
+        }
+
+        ciclo = 0;
+        for(int i=1;i<=N && !ciclo;i++){
+            if(!vis[i]) dfs(i);
+        }
+
+        printf(ciclo? "SIM\n":"NAO\n");
+
+        for(int i=0;i<=N;i++) free(g[i]);
+        free(g);
+        free(vis);
+        free(pilha);
+    }
+    return 0;
+}
