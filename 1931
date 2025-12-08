@@ -1,0 +1,86 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+#define INF 2000000000
+
+typedef struct{
+    int v, custo;
+    struct no *prox;
+}No;
+
+No *grafo[20005];
+int dist[20005][2]; // dist[u][0]=par , dist[u][1]=impar
+
+typedef struct{
+    int v, par, custo;
+}Estado;
+
+typedef struct{
+    Estado h[200005];
+    int size;
+}Heap;
+
+void push(Heap *hp, Estado x){
+    int i = ++hp->size;
+    while(i>1 && hp->h[i/2].custo>x.custo){
+        hp->h[i]=hp->h[i/2];
+        i/=2;
+    }
+    hp->h[i]=x;
+}
+
+Estado pop(Heap *hp){
+    Estado ret = hp->h[1], aux = hp->h[hp->size--];
+    int i=1, j=2;
+    while(j<=hp->size){
+        if(j<hp->size && hp->h[j+1].custo < hp->h[j].custo) j++;
+        if(aux.custo <= hp->h[j].custo) break;
+        hp->h[i]=hp->h[j];
+        i=j, j*=2;
+    }
+    hp->h[i]=aux;
+    return ret;
+}
+
+int main(){
+    int C,V;
+    while(scanf("%d %d",&C,&V)==2){
+        
+        for(int i=1;i<=C;i++){
+            grafo[i]=NULL;
+            dist[i][0]=dist[i][1]=INF;
+        }
+
+        while(V--){
+            int a,b,g;
+            scanf("%d %d %d",&a,&b,&g);
+            No *n1 = malloc(sizeof(No));
+            n1->v=b; n1->custo=g; n1->prox=grafo[a]; grafo[a]=n1;
+            
+            No *n2 = malloc(sizeof(No));
+            n2->v=a; n2->custo=g; n2->prox=grafo[b]; grafo[b]=n2;
+        }
+
+        Heap hp={.size=0};
+        dist[1][0]=0; // começa com 0 pedágios (par)
+        push(&hp,(Estado){1,0,0});
+
+        while(hp.size){
+            Estado at=pop(&hp);
+            if(at.custo>dist[at.v][at.par]) continue;
+            
+            for(No *e=grafo[at.v];e;e=e->prox){
+                int np = at.par ^ 1;
+                int nc = at.custo + e->custo;
+                if(nc < dist[e->v][np]){
+                    dist[e->v][np]=nc;
+                    push(&hp,(Estado){e->v,np,nc});
+                }
+            }
+        }
+
+        if(dist[C][0] == INF) printf("-1\n");
+        else printf("%d\n",dist[C][0]);
+    }
+}
