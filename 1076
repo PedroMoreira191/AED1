@@ -1,0 +1,32 @@
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+    int T;
+    scanf("%d", &T);
+
+    while (T--) {
+        int start, V, A;
+        scanf("%d", &start);      // nodo inicial (não afeta o resultado)
+        scanf("%d %d", &V, &A);
+
+        int adj[50][50];
+        memset(adj, 0, sizeof(adj));
+
+        int u, v;
+        int arestas = 0;
+
+        for (int i = 0; i < A; i++) {
+            scanf("%d %d", &u, &v);
+            if (!adj[u][v]) {          // ainda não contamos essa aresta
+                adj[u][v] = adj[v][u] = 1;
+                arestas++;
+            }
+        }
+
+        int movimentos = 2 * arestas;
+        printf("%d\n", movimentos);
+    }
+
+    return 0;
+}
