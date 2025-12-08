@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct no {
+    int v;
+    struct no *prox;
+} No;
+
+int main() {
+    int T;
+    scanf("%d", &T);
+
+    for (int caso = 0; caso < T; caso++) {
+        int M, C;
+        scanf("%d %d", &M, &C);
+
+        No *hash[100];   // M <= 100
+        for (int i = 0; i < M; i++) {
+            hash[i] = NULL;
+        }
+
+        for (int i = 0; i < C; i++) {
+            int x;
+            scanf("%d", &x);
+            int h = x % M;
+
+            No *novo = (No *)malloc(sizeof(No));
+            novo->v = x;
+            novo->prox = NULL;
+
+            if (hash[h] == NULL) {
+                hash[h] = novo;
+            } else {
+                No *aux = hash[h];
+                while (aux->prox != NULL) aux = aux->prox;
+                aux->prox = novo;
+            }
+        }
+
+        for (int i = 0; i < M; i++) {
+            printf("%d ->", i);
+            No *aux = hash[i];
+            while (aux != NULL) {
+                printf(" %d ->", aux->v);
+                aux = aux->prox;
+            }
+            printf(" \\\n");
+        }
+
+        if (caso < T - 1) printf("\n");
+
+        for (int i = 0; i < M; i++) {
+            No *aux = hash[i];
+            while (aux != NULL) {
+                No *tmp = aux->prox;
+                free(aux);
+                aux = tmp;
+            }
+        }
+    }
+
+    return 0;
+}
