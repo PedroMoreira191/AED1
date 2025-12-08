@@ -1,0 +1,96 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+#define INF 1000000000
+
+typedef struct no {
+    int v, w;
+    struct no* prox;
+}No;
+
+No *g[260];
+int dist[260];
+
+typedef struct{
+    int v,c;
+}State;
+
+typedef struct{
+    State h[200000];
+    int size;
+}Heap;
+
+void push(Heap *hp, State x){
+    int i = ++hp->size;
+    while(i>1 && hp->h[i/2].c > x.c){
+        hp->h[i]=hp->h[i/2];
+        i/=2;
+    }
+    hp->h[i]=x;
+}
+
+State pop(Heap *hp){
+    State ret = hp->h[1], aux = hp->h[hp->size--];
+    int i=1,j=2;
+    while(j<=hp->size){
+        if(j<hp->size && hp->h[j+1].c < hp->h[j].c) j++;
+        if(aux.c <= hp->h[j].c) break;
+        hp->h[i]=hp->h[j];
+        i=j; j*=2;
+    }
+    hp->h[i]=aux;
+    return ret;
+}
+
+void dijkstra(int N,int C,int K){
+    for(int i=0;i<N;i++) dist[i]=INF;
+
+    Heap hp={.size=0};
+    dist[K]=0;
+    push(&hp,(State){K,0});
+
+    while(hp.size){
+        State at = pop(&hp);
+        if(at.c > dist[at.v]) continue;
+
+        if(at.v < C-1){ 
+            int nv = at.v + 1;
+            for(No *e=g[at.v];e;e=e->prox){
+                if(e->v == nv && dist[nv] > at.c + e->w){
+                    dist[nv] = at.c + e->w;
+                    push(&hp,(State){nv,dist[nv]});
+                }
+            }
+            continue;
+        }
+
+        for(No *e=g[at.v];e;e=e->prox){
+            int nv=e->v;
+            if(at.v>=C && dist[nv] > at.c + e->w){
+                dist[nv] = at.c + e->w;
+                push(&hp,(State){nv,dist[nv]});
+            }
+        }
+    }
+}
+
+int main(){
+    int N,M,C,K;
+
+    while(scanf("%d %d %d %d",&N,&M,&C,&K)==4 && (N||M||C||K)){
+
+        for(int i=0;i<N;i++) g[i]=NULL;
+
+        while(M--){
+            int u,v,p;
+            scanf("%d %d %d",&u,&v,&p);
+
+            No *a=malloc(sizeof(No)); a->v=v; a->w=p; a->prox=g[u]; g[u]=a;
+            No *b=malloc(sizeof(No)); b->v=u; b->w=p; b->prox=g[v]; g[v]=b;
+        }
+
+        dijkstra(N,C,K);
+        printf("%d\n", dist[C-1]);
+    }
+}
