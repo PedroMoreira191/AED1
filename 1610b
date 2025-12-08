@@ -1,0 +1,64 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct no{
+    int v;
+    struct no *prox;
+}No;
+
+No **g;
+int *vis,*pilha,ciclo,N;
+
+void dfs(int v){
+    vis[v]=1;
+    pilha[v]=1;
+
+    for(No *aux=g[v];aux;aux=aux->prox){
+        if(!vis[aux->v]) dfs(aux->v);
+        else if(pilha[aux->v]) ciclo=1;
+    }
+    pilha[v]=0;
+}
+
+int main(){
+    int T,M,A,B;
+    scanf("%d",&T);
+
+    while(T--){
+        scanf("%d %d",&N,&M);
+
+        g = malloc((N+1)*sizeof(No*));
+        vis = calloc(N+1,sizeof(int));
+        pilha = calloc(N+1,sizeof(int));
+
+        for(int i=0;i<=N;i++) g[i]=NULL;
+
+        while(M--){
+            scanf("%d %d",&A,&B);
+            No *novo = malloc(sizeof(No));
+            novo->v = B;
+            novo->prox = g[A];
+            g[A] = novo;
+        }
+
+        ciclo=0;
+        for(int i=1;i<=N && !ciclo;i++){
+            if(!vis[i]) dfs(i);
+        }
+
+        printf(ciclo? "SIM\n":"NAO\n");
+
+        for(int i=1;i<=N;i++){
+            No *aux=g[i];
+            while(aux){
+                No*n=aux->prox;
+                free(aux);
+                aux=n;
+            }
+        }
+        free(g);
+        free(vis);
+        free(pilha);
+    }
+    return 0;
+}
