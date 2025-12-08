@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct{
+    int u,v,w;
+}Aresta;
+
+int pai[200001], rankUF[200001];
+
+int find(int x){
+    while(pai[x] != x) x = pai[x];
+    return x;
+}
+
+void uniao(int a,int b){
+    a=find(a); b=find(b);
+    if(a==b) return;
+    if(rankUF[a]<rankUF[b]) pai[a]=b;
+    else if(rankUF[b]<rankUF[a]) pai[b]=a;
+    else{ pai[b]=a; rankUF[a]++; }
+}
+
+int cmp(const void *a,const void *b){
+    return ((Aresta*)a)->w - ((Aresta*)b)->w;
+}
+
+int main(){
+    int m,n;
+
+    while(scanf("%d %d",&m,&n) && (m||n)){
+        Aresta *e = malloc(n*sizeof(Aresta));
+        long long total = 0;
+
+        for(int i=0;i<n;i++){
+            scanf("%d %d %d",&e[i].u,&e[i].v,&e[i].w);
+            total += e[i].w;
+        }
+
+        for(int i=0;i<m;i++){
+            pai[i]=i;
+            rankUF[i]=0;
+        }
+
+        qsort(e,n,sizeof(Aresta),cmp);
+
+        long long mst=0;
+        int usados=0;
+
+        for(int i=0;i<n && usados<m-1;i++){
+            if(find(e[i].u) != find(e[i].v)){
+                uniao(e[i].u, e[i].v);
+                mst += e[i].w;
+                usados++;
+            }
+        }
+
+        printf("%lld\n", total - mst);
+
+        free(e);
+    }
+
+    return 0;
+}
