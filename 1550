@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <string.h>
+
+int reverseNum(int x){
+    int r = 0;
+    while(x > 0){
+        r = r*10 + x%10;
+        x/=10;
+    }
+    return r;
+}
+
+int bfs(int A,int B){
+    static int dist[10001];
+    static int fila[20000];
+    int ini=0,fim=0;
+
+    for(int i=0;i<=10000;i++) dist[i] = -1;
+
+    fila[fim++] = A;
+    dist[A] = 0;
+
+    while(ini < fim){
+        int x = fila[ini++];
+
+        if(x == B) return dist[x];
+
+        // operação +1
+        if(x+1 <= 10000 && dist[x+1]==-1){
+            dist[x+1] = dist[x] + 1;
+            fila[fim++] = x+1;
+        }
+
+        // operação inverter
+        int y = reverseNum(x);
+        if(y <= 10000 && dist[y]==-1){
+            dist[y] = dist[x] + 1;
+            fila[fim++] = y;
+        }
+    }
+    return -1;
+}
+
+int main(){
+    int T,A,B;
+    scanf("%d",&T);
+
+    while(T--){
+        scanf("%d %d",&A,&B);
+        printf("%d\n",bfs(A,B));
+    }
+    return 0;
+}
