@@ -1,0 +1,76 @@
+#include <stdio.h>
+
+#define MAXN 501
+#define INF 1000000000
+
+int N, E;
+int adj[MAXN][MAXN];
+int distv[MAXN];
+int vis[MAXN];
+
+void dijkstra(int s){
+    for(int i = 1; i <= N; i++){
+        distv[i] = INF;
+        vis[i] = 0;
+    }
+    distv[s] = 0;
+
+    for(int k = 1; k <= N; k++){
+        int u = -1, best = INF;
+        for(int i = 1; i <= N; i++){
+            if(!vis[i] && distv[i] < best){
+                best = distv[i];
+                u = i;
+            }
+        }
+        if(u == -1) return;
+        vis[u] = 1;
+
+        for(int v = 1; v <= N; v++){
+            if(adj[u][v] < INF && distv[u] + adj[u][v] < distv[v]){
+                distv[v] = distv[u] + adj[u][v];
+            }
+        }
+    }
+}
+
+int main(){
+    while(scanf("%d %d", &N, &E) && (N || E)){
+        for(int i = 1; i <= N; i++){
+            for(int j = 1; j <= N; j++){
+                if(i == j) adj[i][j] = 0;
+                else       adj[i][j] = INF;
+            }
+        }
+
+        for(int i = 0; i < E; i++){
+            int x, y, h;
+            scanf("%d %d %d", &x, &y, &h);
+
+            if(adj[y][x] < INF){
+                adj[x][y] = 0;
+                adj[y][x] = 0;
+            }else{
+                if(h < adj[x][y]) adj[x][y] = h;
+            }
+        }
+
+        int K;
+        scanf("%d", &K);
+
+        for(int q = 0; q < K; q++){
+            int o, d;
+            scanf("%d %d", &o, &d);
+
+            dijkstra(o);
+
+            if(distv[d] == INF)
+                printf("Nao e possivel entregar a carta\n");
+            else
+                printf("%d\n", distv[d]);
+        }
+
+        printf("\n");
+    }
+    return 0;
+}
