@@ -1,0 +1,73 @@
+#include <stdio.h>
+#include <string.h>
+
+int grafo[26][26];
+int visitado[26];
+int V, E;
+
+int comp[26];   // guarda os vértices de um componente
+int compSize;
+
+void dfs(int u){
+    visitado[u] = 1;
+    comp[compSize++] = u;
+
+    for(int v = 0; v < V; v++){
+        if(grafo[u][v] && !visitado[v]){
+            dfs(v);
+        }
+    }
+}
+
+int main(){
+    int T;
+    scanf("%d", &T);
+
+    for(int caso = 1; caso <= T; caso++){
+        scanf("%d %d", &V, &E);
+
+        memset(grafo, 0, sizeof(grafo));
+        memset(visitado, 0, sizeof(visitado));
+
+        for(int i = 0; i < E; i++){
+            char x, y;
+            scanf(" %c %c", &x, &y);
+            int a = x - 'a';
+            int b = y - 'a';
+            grafo[a][b] = grafo[b][a] = 1;
+        }
+
+        printf("Case #%d:\n", caso);
+
+        int componentes = 0;
+
+        for(int i = 0; i < V; i++){
+            if(!visitado[i]){
+                compSize = 0;
+                dfs(i);
+                componentes++;
+
+                // ordena os vértices desse componente
+                for(int p = 0; p < compSize; p++){
+                    for(int q = p + 1; q < compSize; q++){
+                        if(comp[q] < comp[p]){
+                            int tmp = comp[p];
+                            comp[p] = comp[q];
+                            comp[q] = tmp;
+                        }
+                    }
+                }
+
+                // imprime em ordem alfabética, com vírgula no fim
+                for(int p = 0; p < compSize; p++){
+                    printf("%c,", 'a' + comp[p]);
+                }
+                printf("\n");
+            }
+        }
+
+        printf("%d connected components\n\n", componentes);
+    }
+
+    return 0;
+}
